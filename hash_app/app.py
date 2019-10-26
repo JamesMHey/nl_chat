@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import os
-
+import pickle
 
 app = Flask(__name__)
 app.config.from_object(os.getenv('APP_SETTINGS', "config.DevelopmentConfig"))
@@ -16,9 +16,18 @@ def hello():
     return "Hello World!"
 
 
-@app.route('/<name>')
-def hello_name(name):
-    return "Hello {}!".format(name)
+@app.route('/sms')
+def hello_name():
+    return str(request.__repr__)
+
+@app.route('/sms_capture')
+def sms_capture():
+    pickle.dump( request, open( "mock_requests/captured_request.p", "wb" ))
+    with open('mock_requests/capture_requests.txt','w') as f:
+        f.write(str(request.__dict__))
+
+    return str(request.__dict__)
+
 
 
 if __name__ == "__main__":
