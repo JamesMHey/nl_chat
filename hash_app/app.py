@@ -25,8 +25,12 @@ def sms_capture():
     resp = MessagingResponse()
     from_n = request.values.get('From')
     from_n = get_hash(from_n)
+    # add to DB if not in there
+    from models import HashPair
+    HashPair.
     # Add a message
     resp.message("body {}. From {}".format(body, from_n))
+
     return str(resp)
 
 @app.route('/sms_send', methods=['GET', 'POST'])

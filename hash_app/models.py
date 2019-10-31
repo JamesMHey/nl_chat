@@ -1,5 +1,9 @@
 from app import db
-from twilio_interface import twilio_interface
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Column, Integer, String, Date, Table, Boolean, DateTime
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+Base = declarative_base()
 
 class Result(db.Model):
     __tablename__ = 'results'
@@ -22,5 +26,22 @@ class HashPair(db.Model):
     def __init__(self, uid, number):
         self.uid = uid
         self.number = number
+        self.last_seen = datetime.now()
 
-    def 
+    def __repr__(self):
+        return '<uid:{},number:{}>'.format(self.uid, self.number)
+
+    def seen(self):
+        self.last_seen = datetime.now()
+
+    def time_since_last_seen(self): # Return number of seconds since last seen
+        return (datetime.now() - self.last_seen).total_seconds()
+
+    def expired(self):
+        if self.time_since_last_seen()>(7*24*60):
+            return True
+        return False
+
+if __name__ == '__main__':
+    engine = create_engine('sqlite:///hashpairs.db', echo=False)
+    Base.metadata.create_all(engine)
